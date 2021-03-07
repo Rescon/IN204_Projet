@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{CJK}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+
+\title{IN204}
+\author{Yu WANG}
+\date{March 2021}
+
+
+\floatname{algorithm}{Algorithme}
+\renewcommand{\algorithmicrequire}{\textbf{Input}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+ 
+\begin{document}
+\maketitle
+\begin{CJK*}{UTF8}{gkai}
+    \begin{algorithm}
+        \caption{Ray tracing}
+        \begin{algorithmic}[1]
+            \Require $std::vector<Object*>$，$std::vector<Source*>$
+            \Ensure $pixels[Width*Height]$
+            \For{$each$ $pixel$ $of$ $the$ $image$}
+                \State $ray \gets $
+                \Call{generateRay}{$Camera, xPostion, yPosition$}
+                    \For{$i = 0$ to $number$ $of$ $objects$}
+                        \State $intersections[i] \gets $
+                        \Call{findIntersections}{$ray, objects$}
+                    \EndFor
+                    \State $indexClosest \gets $
+                    \Call{findIndexClosest}{$intersections$}
+                    \If{$indexClosest == -1$}
+                        \State $pixel \gets BLACK $
+                    \Else
+                        \State $pixel \gets $
+                        \Call{getColor}{$indexClosest, ray, intersections, objects, sources$}
+                    \EndIf
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}
+    
+    \begin{algorithm}
+        \caption{getColor}
+        \begin{algorithmic}[1]
+            \Require $indexClosest, ray, intersections, objects, sources$
+            \Ensure $finalColor$
+            \State $objectColor \gets $
+            \Call{getColor}{$objects[indexClosest]$}
+            \State $finalColor \gets 0.2*objectColor$
+            \For{$i = 0$ to $number$ $of$ $sourcea$}
+                \If{$shadow == false$}
+                    \State $sourceColor \gets $
+                    \Call{getColor}{$sources[i]$}
+                    \State $finalColor \gets finalColor+$
+                    \Call{modulate}{$objectColor,sourceColor$}
+                    \State $reflect \gets $
+                    \Call{getReflect}{$objects[indexClosest]$}
+                    \If{$0<reflect<=1$}
+                        \State $specular \gets $
+                        \Call{dot}{$reflectionDirection,lightDirection$}
+                        \If{$specular>0$}
+                            \State $specular \gets $
+                            \Call{pow}{$specular,10$}
+                            \State $finalColor \gets finalColor+$
+                            \Call{mul}{$sourceColor,specular*reflect$}
+                        \EndIf
+                    \EndIf
+                \EndIf
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}
+\end{CJK*}
+\end{document}
